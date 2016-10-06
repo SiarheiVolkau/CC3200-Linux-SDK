@@ -969,16 +969,16 @@ static _SlReturnVal_t _SlDrvMsgRead(void)
 		return SL_API_ABORTED;
 	}
 #endif
-    OpCode = OPCODE(uBuf.TempBuf);
-    RespPayloadLen = (_u16)(RSP_PAYLOAD_LEN(uBuf.TempBuf));
+    OpCode = OPCODE(uBuf.DummyBuf);
+    RespPayloadLen = (_u16)(RSP_PAYLOAD_LEN(uBuf.DummyBuf));
 
 
     /* 'Init Compelete' message bears no valid FlowControl info */
     if(SL_OPCODE_DEVICE_INITCOMPLETE != OpCode)
     {
-        g_pCB->FlowContCB.TxPoolCnt = ((_SlResponseHeader_t *)uBuf.TempBuf)->TxPoolCnt;
-        g_pCB->SocketNonBlocking = ((_SlResponseHeader_t *)uBuf.TempBuf)->SocketNonBlocking;
-        g_pCB->SocketTXFailure = ((_SlResponseHeader_t *)uBuf.TempBuf)->SocketTXFailure;
+        g_pCB->FlowContCB.TxPoolCnt = ((_SlResponseHeader_t *)uBuf.DummyBuf)->TxPoolCnt;
+        g_pCB->SocketNonBlocking = ((_SlResponseHeader_t *)uBuf.DummyBuf)->SocketNonBlocking;
+        g_pCB->SocketTXFailure = ((_SlResponseHeader_t *)uBuf.DummyBuf)->SocketTXFailure;
 
         if(g_pCB->FlowContCB.TxPoolCnt > FLOW_CONT_MIN)
         {
@@ -1080,12 +1080,12 @@ static _SlReturnVal_t _SlDrvMsgRead(void)
             NWP_IF_READ_CHECK(g_pCB->FD, &uBuf.TempBuf[4], RECV_ARGS_SIZE);
 
             /*  Validate Socket ID and Received Length value.  */
-            VERIFY_PROTOCOL((SD(&uBuf.TempBuf[4])& BSD_SOCKET_ID_MASK) < SL_MAX_SOCKETS);
+            VERIFY_PROTOCOL((SD(&uBuf.DummyBuf[1])& BSD_SOCKET_ID_MASK) < SL_MAX_SOCKETS);
 
             SL_DRV_PROTECTION_OBJ_LOCK_FOREVER();
 
             /* go over the active list if exist to find obj waiting for this Async event */
-				VERIFY_RET_OK(_SlFindAndSetActiveObj(OpCode,SD(&uBuf.TempBuf[4]) & BSD_SOCKET_ID_MASK));
+				VERIFY_RET_OK(_SlFindAndSetActiveObj(OpCode,SD(&uBuf.DummyBuf[1]) & BSD_SOCKET_ID_MASK));
 
             /*  Verify data is waited on this socket. The pArgs should have been set by _SlDrvDataReadOp(). */
             VERIFY_SOCKET_CB(NULL !=  ((_SlArgsData_t *)(g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pData))->pArgs);	
@@ -1102,7 +1102,7 @@ static _SlReturnVal_t _SlDrvMsgRead(void)
             /*  Here g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pData contains requested(expected) Recv/Recvfrom DataSize. */
             /*  Overwrite requested DataSize with actual one. */
             /*  If error is received, this information will be read from arguments. */
-            if(ACT_DATA_SIZE(&uBuf.TempBuf[4]) > 0)
+            if(ACT_DATA_SIZE(&uBuf.DummyBuf[1]) > 0)
             {       
                 VERIFY_SOCKET_CB(NULL != ((_SlArgsData_t *)(g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pRespArgs))->pData);
 
@@ -1110,8 +1110,8 @@ static _SlReturnVal_t _SlDrvMsgRead(void)
                 /*  therefore check the requested length and read only  */
                 /*  4 bytes aligned data. The rest unaligned (if any) will be read */
                 /*  and copied to a TailBuffer  */
-                LengthToCopy = (_u16)(ACT_DATA_SIZE(&uBuf.TempBuf[4]) & (3));
-                AlignedLengthRecv = (_u16)(ACT_DATA_SIZE(&uBuf.TempBuf[4]) & (~3));
+                LengthToCopy = (_u16)(ACT_DATA_SIZE(&uBuf.DummyBuf[1]) & (3));
+                AlignedLengthRecv = (_u16)(ACT_DATA_SIZE(&uBuf.DummyBuf[1]) & (~3));
                 if( AlignedLengthRecv >= 4)
                 {
                     NWP_IF_READ_CHECK(g_pCB->FD,((_SlArgsData_t *)(g_pCB->ObjPool[g_pCB->FunctionParams.AsyncExt.ActionIndex].pRespArgs))->pData,AlignedLengthRecv );                      
@@ -1144,7 +1144,7 @@ static _SlReturnVal_t _SlDrvMsgRead(void)
         if((NULL != g_pCB->FunctionParams.pCmdExt) && (0 != g_pCB->FunctionParams.pCmdExt->RxPayloadLen))
         {
             /*  Actual size of command's response payload: <msg_payload_len> - <rsp_args_len> */
-            _i16    ActDataSize = (_i16)(RSP_PAYLOAD_LEN(uBuf.TempBuf) - g_pCB->FunctionParams.pCmdCtrl->RxDescLen);
+            _i16    ActDataSize = (_i16)(RSP_PAYLOAD_LEN(uBuf.DummyBuf) - g_pCB->FunctionParams.pCmdCtrl->RxDescLen);
 
             g_pCB->FunctionParams.pCmdExt->ActualRxPayloadLen = ActDataSize;
 
