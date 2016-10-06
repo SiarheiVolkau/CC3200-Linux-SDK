@@ -43,8 +43,6 @@
 extern "C" {
 #endif
 
-#include <stddef.h>
-
 #define OSI_WAIT_FOREVER   			(0xFFFFFFFF)
 
 #define OSI_NO_WAIT        			(0)
@@ -119,7 +117,7 @@ typedef void * OsiLockObj_t;
 
 	\note	The stack size of the execution thread must be at least of TBD bytes!
 */
-typedef void (*P_OSI_SPAWN_ENTRY)(void* pValue);
+typedef short (*P_OSI_SPAWN_ENTRY)(void* pValue);
 
 typedef void (*P_OSI_EVENT_HANDLER)(void* pValue);
 
