@@ -23,16 +23,15 @@ RELEASE_LIBRARY=$(OUTDIR)/Release/${LIBRARY}
 DEBUG_OBJPATH=obj/Debug
 RELEASE_OBJPATH=obj/Release
 
+# Tools Setup
+ifeq (,$(CROSS_COMPILE))
+	CROSS_COMPILE=arm-none-eabi-
+endif
+CC=$(CROSS_COMPILE)gcc
+AR=$(CROSS_COMPILE)ar
+
 # Where to find header files
 IPATH=-I${SDK_ROOT}
-
-# Tools Setup
-ifeq (${CC},cc)
-	CC=arm-none-eabi-gcc
-endif
-ifeq ($(AR),)
-	AR=arm-none-eabi-ar
-endif
 
 # C Compiler Flags
 CFLAGS_COMMON=-mthumb       \
@@ -58,37 +57,44 @@ SOURCES= adc.c aes.c camera.c cpu.c crc.c des.c flash.c gpio.c hwspinlock.c i2c.
 dir_create=@mkdir -p $(@D)
 
 # Objects
-DEBUG_OBJECTS= $(addprefix $(DEBUG_OBJPATH)/,$(SOURCES:.c=.o))
-RELEASE_OBJECTS= $(addprefix $(RELEASE_OBJPATH)/,$(SOURCES:.c=.o))
+DEBUG_OBJECTS= $(SOURCES:%.c=$(DEBUG_OBJPATH)/%.o)
+RELEASE_OBJECTS= $(SOURCES:%.c=$(RELEASE_OBJPATH)/%.o)
 
 all: debug release
 
-debug: $(DEBUG_LIBRARY)
+# Rules for rebuild when dependencies changed
+# GCC option -MD enables dependency rules generation
+-include $(SOURCES:%.c=$(DEBUG_OBJPATH)/%.d)
+-include $(SOURCES:%.c=$(RELEASE_OBJPATH)/%.d)
 
-release: $(RELEASE_LIBRARY)
-
-DEBUG_TARGETS= $(addprefix $(DEBUG_OBJPATH)/,$(SOURCES:.c=.o))
-$(DEBUG_TARGETS): Makefile
+# *.o build rules
+$(DEBUG_OBJPATH)%.o: $(SRC_ROOT)/%.c Makefile
 	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$(SRC_ROOT)/$(@:$(DEBUG_OBJPATH)/%.o=%.c)" -o "$@";
+	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
 	@echo "CC	$@";
 
-RELEASE_TARGETS= $(addprefix $(RELEASE_OBJPATH)/,$(SOURCES:.c=.o))
-$(RELEASE_TARGETS): Makefile
+$(RELEASE_OBJPATH)%.o: $(SRC_ROOT)/%.c Makefile
 	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$(SRC_ROOT)/$(@:$(RELEASE_OBJPATH)/%.o=%.c)" -o "$@";
+	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
 	@echo "CC	$@";
 
-$(DEBUG_LIBRARY): $(DEBUG_TARGETS)
+# *.a build rules
+$(DEBUG_LIBRARY): $(DEBUG_OBJECTS)
 	$(dir_create)
 	@${AR} -cr $@ $(DEBUG_OBJECTS)
 	@echo "AR	$@";
 
-$(RELEASE_LIBRARY): $(RELEASE_TARGETS)
+$(RELEASE_LIBRARY): $(RELEASE_OBJECTS)
 	$(dir_create)
 	@${AR} -cr $@ $(RELEASE_OBJECTS)
 	@echo "AR	$@";
 
+# Rules for build release & debug libs
+debug: $(DEBUG_LIBRARY)
+
+release: $(RELEASE_LIBRARY)
+
+# clean rules
 clean_debug:
 	@rm -rf $(DEBUG_OBJPATH)/*.d
 	@echo "rm -rf $(DEBUG_OBJPATH)/*.d";
