@@ -54,31 +54,38 @@ SOURCES= adc.c aes.c camera.c cpu.c crc.c des.c flash.c gpio.c hwspinlock.c i2c.
 	interrupt.c i2s.c pin.c prcm.c sdhost.c shamd5.c spi.c systick.c timer.c \
 	uart.c udma.c utils.c wdt.c
 
+# Directory creator
+dir_create=@mkdir -p $(@D)
+
 # Objects
 DEBUG_OBJECTS= $(addprefix $(DEBUG_OBJPATH)/,$(SOURCES:.c=.o))
 RELEASE_OBJECTS= $(addprefix $(RELEASE_OBJPATH)/,$(SOURCES:.c=.o))
 
 all: debug release
 
-debug: mkdirs $(DEBUG_LIBRARY)
+debug: $(DEBUG_LIBRARY)
 
-release: mkdirs $(RELEASE_LIBRARY)
+release: $(RELEASE_LIBRARY)
 
 DEBUG_TARGETS= $(addprefix $(DEBUG_OBJPATH)/,$(SOURCES:.c=.o))
 $(DEBUG_TARGETS): Makefile
+	$(dir_create)
 	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$(SRC_ROOT)/$(@:$(DEBUG_OBJPATH)/%.o=%.c)" -o "$@";
 	@echo "CC	$@";
 
 RELEASE_TARGETS= $(addprefix $(RELEASE_OBJPATH)/,$(SOURCES:.c=.o))
 $(RELEASE_TARGETS): Makefile
+	$(dir_create)
 	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$(SRC_ROOT)/$(@:$(RELEASE_OBJPATH)/%.o=%.c)" -o "$@";
 	@echo "CC	$@";
 
 $(DEBUG_LIBRARY): $(DEBUG_TARGETS)
+	$(dir_create)
 	@${AR} -cr $@ $(DEBUG_OBJECTS)
 	@echo "AR	$@";
 
 $(RELEASE_LIBRARY): $(RELEASE_TARGETS)
+	$(dir_create)
 	@${AR} -cr $@ $(RELEASE_OBJECTS)
 	@echo "AR	$@";
 
@@ -99,11 +106,5 @@ clean_release:
 	@echo "rm -rf $(RELEASE_LIBRARY)";
 
 clean: clean_debug clean_release
-
-mkdirs:
-	@mkdir -p "$(OUTDIR)/Debug"
-	@mkdir -p "$(OUTDIR)/Release"
-	@mkdir -p "$(DEBUG_OBJPATH)"
-	@mkdir -p "$(RELEASE_OBJPATH)"
 
 .PHONY: all clean
