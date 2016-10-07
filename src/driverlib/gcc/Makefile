@@ -6,6 +6,8 @@
 #
 #*****************************************************************************
 
+.PHONY: all clean
+
 # The base SDK directory.
 SDK_ROOT=../..
 
@@ -24,9 +26,8 @@ DEBUG_OBJPATH=obj/Debug
 RELEASE_OBJPATH=obj/Release
 
 # Tools Setup
-ifeq (,$(CROSS_COMPILE))
-	CROSS_COMPILE=arm-none-eabi-
-endif
+CROSS_COMPILE ?= arm-none-eabi-
+
 CC=$(CROSS_COMPILE)gcc
 AR=$(CROSS_COMPILE)ar
 
@@ -68,12 +69,12 @@ all: debug release
 -include $(SOURCES:%.c=$(RELEASE_OBJPATH)/%.d)
 
 # *.o build rules
-$(DEBUG_OBJPATH)%.o: $(SRC_ROOT)/%.c Makefile
+$(DEBUG_OBJPATH)/%.o: $(SRC_ROOT)/%.c Makefile
 	$(dir_create)
 	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
 	@echo "CC	$@";
 
-$(RELEASE_OBJPATH)%.o: $(SRC_ROOT)/%.c Makefile
+$(RELEASE_OBJPATH)/%.o: $(SRC_ROOT)/%.c Makefile
 	$(dir_create)
 	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
 	@echo "CC	$@";
@@ -113,4 +114,3 @@ clean_release:
 
 clean: clean_debug clean_release
 
-.PHONY: all clean

@@ -6,6 +6,8 @@
 #
 #*****************************************************************************
 
+.PHONY: all clean
+
 # The base SDK directory.
 SDK_ROOT=../..
 
@@ -27,9 +29,8 @@ DEBUG_OBJPATH=obj/Debug
 RELEASE_OBJPATH=obj/Release
 
 # Tools Setup
-ifeq (,$(CROSS_COMPILE))
-	CROSS_COMPILE=arm-none-eabi-
-endif
+CROSS_COMPILE=arm-none-eabi-
+
 CC=$(CROSS_COMPILE)gcc
 AR=$(CROSS_COMPILE)ar
 
@@ -66,6 +67,8 @@ SOURCES= osi_freertos.c \
 	timers.c        \
 	heap_4.c
 
+vpath %.c $(SRC_ROOT):$(RTOSDIR):$(RTOSDIR)/portable/GCC/ARM_CM4:$(RTOSDIR)/portable/MemMang
+
 # Directory creator
 dir_create=@mkdir -p $(@D)
 
@@ -82,82 +85,12 @@ all: debug release
 -include $(SOURCES:%.c=$(RELEASE_OBJPATH)/%.d)
 
 # *.o build rules
-$(DEBUG_OBJPATH)/osi_freertos.o: $(SRC_ROOT)/osi_freertos.c Makefile
+$(DEBUG_OBJPATH)/%.o: %.c Makefile
 	$(dir_create)
 	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
 	@echo "CC	$@";
 
-$(DEBUG_OBJPATH)/croutine.o: $(RTOSDIR)/croutine.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(DEBUG_OBJPATH)/list.o: $(RTOSDIR)/list.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(DEBUG_OBJPATH)/queue.o: $(RTOSDIR)/queue.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(DEBUG_OBJPATH)/tasks.o: $(RTOSDIR)/tasks.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(DEBUG_OBJPATH)/timers.o: $(RTOSDIR)/timers.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(DEBUG_OBJPATH)/port.o: $(RTOSDIR)/portable/GCC/ARM_CM4/port.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(DEBUG_OBJPATH)/heap_4.o: $(RTOSDIR)/portable/MemMang/heap_4.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(DEBUG_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(RELEASE_OBJPATH)/osi_freertos.o: $(SRC_ROOT)/osi_freertos.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(RELEASE_OBJPATH)/croutine.o: $(RTOSDIR)/croutine.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(RELEASE_OBJPATH)/list.o: $(RTOSDIR)/list.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(RELEASE_OBJPATH)/queue.o: $(RTOSDIR)/queue.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(RELEASE_OBJPATH)/tasks.o: $(RTOSDIR)/tasks.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(RELEASE_OBJPATH)/timers.o: $(RTOSDIR)/timers.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(RELEASE_OBJPATH)/port.o: $(RTOSDIR)/portable/GCC/ARM_CM4/port.c Makefile
-	$(dir_create)
-	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
-	@echo "CC	$@";
-
-$(RELEASE_OBJPATH)/heap_4.o: $(RTOSDIR)/portable/MemMang/heap_4.c Makefile
+$(RELEASE_OBJPATH)/%.o: %.c Makefile
 	$(dir_create)
 	@$(CC) $(CFLAGS_COMMON) $(RELEASE_CFLAGS) $(CFLAGS) -c "$<" -o "$@";
 	@echo "CC	$@";
@@ -196,5 +129,3 @@ clean_release:
 	@echo "rm -rf $(RELEASE_LIBRARY)";
 
 clean: clean_debug clean_release
-
-.PHONY: all clean
