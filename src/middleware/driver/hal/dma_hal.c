@@ -181,38 +181,38 @@ struct chan_mux_desc {
         {DMA_USER_##m1, DMA_USER_##m2, DMA_USER_##m3, DMA_USER_SW_PROG}
 
 static const struct chan_mux_desc chan_mux[] = {
-        {CHAN_MUX_OPT(TIMER0_A, MOD_NONE, MOD_NONE)}, /* Chan# 00 */
-        {CHAN_MUX_OPT(TIMER0_B, MOD_NONE, MOD_NONE)}, /* Chan# 01 */
-        {CHAN_MUX_OPT(TIMER1_A, MOD_NONE, MOD_NONE)}, /* Chan# 02 */
-        {CHAN_MUX_OPT(TIMER1_B, MOD_NONE, MOD_NONE)}, /* Chan# 03 */
-        {CHAN_MUX_OPT(TIMER2_A, MOD_NONE, MASP0_RX)}, /* Chan# 04 */
-        {CHAN_MUX_OPT(TIMER2_B, MOD_NONE, MASP0_TX)}, /* Chan# 05 */
-        {CHAN_MUX_OPT(TIMER3_A, SPI1_RX,  GPIO_C  )}, /* Chan# 06 */
-        {CHAN_MUX_OPT(TIMER3_B, SPI1_TX,  GPIO_D  )}, /* Chan# 07 */
-        {CHAN_MUX_OPT(UART0_RX, TIMER0_A, TIMER2_A)}, /* Chan# 08 */
-        {CHAN_MUX_OPT(UART0_TX, TIMER0_B, TIMER2_B)}, /* Chan# 09 */
-        {CHAN_MUX_OPT(UART1_RX, TIMER1_A, TIMER3_A)}, /* Chan# 10 */
-        {CHAN_MUX_OPT(UART1_TX, TIMER1_B, TIMER3_B)}, /* Chan# 11 */
-        {CHAN_MUX_OPT(SPI2_RX,  MOD_NONE, MOD_NONE)}, /* Chan# 12 */
-        {CHAN_MUX_OPT(SPI2_TX,  MOD_NONE, MOD_NONE)}, /* Chan# 13 */
-        {CHAN_MUX_OPT(MOD_ADC0, MOD_NONE, MOD_NONE)}, /* Chan# 14 */
-        {CHAN_MUX_OPT(MOD_ADC2, MOD_NONE, MOD_NONE)}, /* Chan# 15 */
-        {CHAN_MUX_OPT(MOD_ADC4, TIMER2_A, MOD_NONE)}, /* Chan# 16 */
-        {CHAN_MUX_OPT(MOD_ADC6, TIMER2_B, MOD_NONE)}, /* Chan# 17 */
-        {CHAN_MUX_OPT(GPIO_A,   MOD_NONE, MASP0_RX)}, /* Chan# 18 */
-        {CHAN_MUX_OPT(GPIO_B,   MOD_NONE, MASP0_TX)}, /* Chan# 19 */
-        {CHAN_MUX_OPT(GPIO_C,   MOD_NONE, MOD_NONE)}, /* Chan# 20 */
-        {CHAN_MUX_OPT(GPIO_D,   MOD_NONE, MOD_NONE)}, /* Chan# 21 */
-        {CHAN_MUX_OPT(CAM_PORT, MOD_NONE, MOD_NONE)}, /* Chan# 22 */
-        {CHAN_MUX_OPT(MOD_NONE, TIMER3_A, TIMER2_A)}, /* Chan# 23 */
-        {CHAN_MUX_OPT(MOD_NONE, TIMER3_B, TIMER2_B)}, /* Chan# 24 */
-        {CHAN_MUX_OPT(SPI0_RX,  I2C0_RX,  TIMER2_A)}, /* Chan# 25 */
-        {CHAN_MUX_OPT(SPI0_TX,  I2C0_TX,  TIMER2_B)}, /* Chan# 26 */
-        {CHAN_MUX_OPT(MOD_NONE, GPIO_A,   TIMER2_A)}, /* Chan# 27 */
-        {CHAN_MUX_OPT(MOD_NONE, GPIO_B,   TIMER2_B)}, /* Chan# 28 */
-        {CHAN_MUX_OPT(MOD_NONE, MOD_NONE, TIMER2_A)}, /* Chan# 29 */
-        {CHAN_MUX_OPT(SPI1_RX,  MOD_NONE, I2C0_RX)},  /* Chan# 30 */
-        {CHAN_MUX_OPT(SPI1_TX,  MOD_NONE, I2C0_TX)}   /* Chan# 31 */
+        CHAN_MUX_OPT(TIMER0_A, MOD_NONE, MOD_NONE), /* Chan# 00 */
+        CHAN_MUX_OPT(TIMER0_B, MOD_NONE, MOD_NONE), /* Chan# 01 */
+        CHAN_MUX_OPT(TIMER1_A, MOD_NONE, MOD_NONE), /* Chan# 02 */
+        CHAN_MUX_OPT(TIMER1_B, MOD_NONE, MOD_NONE), /* Chan# 03 */
+        CHAN_MUX_OPT(TIMER2_A, MOD_NONE, MASP0_RX), /* Chan# 04 */
+        CHAN_MUX_OPT(TIMER2_B, MOD_NONE, MASP0_TX), /* Chan# 05 */
+        CHAN_MUX_OPT(TIMER3_A, SPI1_RX,  GPIO_C  ), /* Chan# 06 */
+        CHAN_MUX_OPT(TIMER3_B, SPI1_TX,  GPIO_D  ), /* Chan# 07 */
+        CHAN_MUX_OPT(UART0_RX, TIMER0_A, TIMER2_A), /* Chan# 08 */
+        CHAN_MUX_OPT(UART0_TX, TIMER0_B, TIMER2_B), /* Chan# 09 */
+        CHAN_MUX_OPT(UART1_RX, TIMER1_A, TIMER3_A), /* Chan# 10 */
+        CHAN_MUX_OPT(UART1_TX, TIMER1_B, TIMER3_B), /* Chan# 11 */
+        CHAN_MUX_OPT(SPI2_RX,  MOD_NONE, MOD_NONE), /* Chan# 12 */
+        CHAN_MUX_OPT(SPI2_TX,  MOD_NONE, MOD_NONE), /* Chan# 13 */
+        CHAN_MUX_OPT(MOD_ADC0, MOD_NONE, MOD_NONE), /* Chan# 14 */
+        CHAN_MUX_OPT(MOD_ADC2, MOD_NONE, MOD_NONE), /* Chan# 15 */
+        CHAN_MUX_OPT(MOD_ADC4, TIMER2_A, MOD_NONE), /* Chan# 16 */
+        CHAN_MUX_OPT(MOD_ADC6, TIMER2_B, MOD_NONE), /* Chan# 17 */
+        CHAN_MUX_OPT(GPIO_A,   MOD_NONE, MASP0_RX), /* Chan# 18 */
+        CHAN_MUX_OPT(GPIO_B,   MOD_NONE, MASP0_TX), /* Chan# 19 */
+        CHAN_MUX_OPT(GPIO_C,   MOD_NONE, MOD_NONE), /* Chan# 20 */
+        CHAN_MUX_OPT(GPIO_D,   MOD_NONE, MOD_NONE), /* Chan# 21 */
+        CHAN_MUX_OPT(CAM_PORT, MOD_NONE, MOD_NONE), /* Chan# 22 */
+        CHAN_MUX_OPT(MOD_NONE, TIMER3_A, TIMER2_A), /* Chan# 23 */
+        CHAN_MUX_OPT(MOD_NONE, TIMER3_B, TIMER2_B), /* Chan# 24 */
+        CHAN_MUX_OPT(SPI0_RX,  I2C0_RX,  TIMER2_A), /* Chan# 25 */
+        CHAN_MUX_OPT(SPI0_TX,  I2C0_TX,  TIMER2_B), /* Chan# 26 */
+        CHAN_MUX_OPT(MOD_NONE, GPIO_A,   TIMER2_A), /* Chan# 27 */
+        CHAN_MUX_OPT(MOD_NONE, GPIO_B,   TIMER2_B), /* Chan# 28 */
+        CHAN_MUX_OPT(MOD_NONE, MOD_NONE, TIMER2_A), /* Chan# 29 */
+        CHAN_MUX_OPT(SPI1_RX,  MOD_NONE, I2C0_RX),  /* Chan# 30 */
+        CHAN_MUX_OPT(SPI1_TX,  MOD_NONE, I2C0_TX)   /* Chan# 31 */
 };
 
 static u32 get_user_mux_mode(u8 chan_id, u8 user_id)
