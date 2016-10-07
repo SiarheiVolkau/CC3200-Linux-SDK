@@ -1,31 +1,28 @@
-DRIVERLIB = src/driverlib
-SIMPLELINK = src/simplelink
-OSLIB = src/oslib
-MIDDLEWARE = src/middleware
-WEBCLIENT = src/netapps/http/client
-WEBSERVER = src/netapps/http/server
-JSON = src/netapps/json
-MQTT = src/netapps/mqtt
-SMTP = src/netapps/smtp/client
-TFTP = src/netapps/tftp/client
-XMPP = src/netapps/xmpp/client
+#******************************************************************************
+#
+# Makefile - Rules for building all the stuff.
+#
+#	v- 1.2.0
+#
+#*****************************************************************************
 
-ifeq ("${target}", "NONOS")
-	SDK_TARGETS = $(SIMPLELINK) $(MIDDLEWARE) 
-else
-	ifeq ("${target}", "TINY")
-		SDK_TARGETS = $(SIMPLELINK)
-	else
-	SDK_TARGETS = $(DRIVERLIB) $(SIMPLELINK) $(OSLIB) $(MIDDLEWARE) $(WEBCLIENT) $(WEBSERVER) $(JSON) $(MQTT) $(SMTP) $(TFTP) $(XMPP)
-	endif
-endif
+SDK_LIBS = driverlib simplelink oslib middleware
+SDK_EXAMPLES = driverlib simplelink oslib middleware
 
-.PHONY: all clean $(SDK_TARGETS)
+.PHONY: all clean
 
-all: $(SDK_TARGETS)
+all: libs examples
 
-$(SDK_TARGETS):
-	cd $@ && $(MAKE)
+clean: clean_libs clean_examples
 
-clean: 
-	rm -rf lib/*
+libs: $(SDK_LIBS:%=lib/%)
+
+lib/%: src/%/gcc/Makefile
+	@$(MAKE) -C "$(dir $<)" all
+
+clean_libs: $(SDK_LIBS:%=clean_lib/%)
+
+clean_lib/%: src/%/gcc/Makefile
+	@$(MAKE) -C "$(dir $<)" clean
+
+examples: #TODO
