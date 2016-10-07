@@ -229,8 +229,8 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pSlWlanEvent)
             pEventData = &pSlWlanEvent->EventData.STAandP2PModeDisconnected;
 
             // If the user has initiated 'Disconnect' request, 
-            //'reason_code' is SL_USER_INITIATED_DISCONNECTION 
-            if(SL_USER_INITIATED_DISCONNECTION == pEventData->reason_code)
+            //'reason_code' is SL_WLAN_DISCONNECT_USER_INITIATED_DISCONNECTION 
+            if(SL_WLAN_DISCONNECT_USER_INITIATED_DISCONNECTION == pEventData->reason_code)
             {
                 UART_PRINT("[WLAN EVENT]Device disconnected from the AP: %s, "
                            "BSSID: %x:%x:%x:%x:%x:%x on application's request "
@@ -524,18 +524,18 @@ void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
         		 UART_PRINT("[SOCK ERROR] - close socket (%d) operation"
         				 	 "accept failed due to ssl issue\n\r",
         				 	 pSock->socketAsyncEvent.SockAsyncData.sd);
-        		 break;
+                 break;
         	 case RX_FRAGMENTATION_TOO_BIG:
         		 UART_PRINT("[SOCK ERROR] -close scoket (%d) operation"
 							 "connection less mode, rx packet fragmentation\n\r"
         				 	 "> 16K, packet is being released",
 							 pSock->socketAsyncEvent.SockAsyncData.sd);
-        		 break;
+                 break;
         	 case OTHER_SIDE_CLOSE_SSL_DATA_NOT_ENCRYPTED:
         		 UART_PRINT("[SOCK ERROR] -close socket (%d) operation"
         				 	 "remote side down from secure to unsecure\n\r",
         		 			pSock->socketAsyncEvent.SockAsyncData.sd);
-        		 break;
+                 break;
         	 default:
         		 UART_PRINT("unknown sock async event: %d\n\r",
         				 	 pSock->socketAsyncEvent.SockAsyncData.type);
@@ -563,7 +563,6 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
 {
 
 }
-
 
 //*****************************************************************************
 // SimpleLink Asynchronous Event Handlers -- End
@@ -1228,42 +1227,41 @@ Network_IF_UnsetMCUMachineState(char cStat)
 //!
 //
 //*****************************************************************************
-// Removed because gcc already have itoa
-//unsigned short itoa(short cNum, char *cString)
-//{
-//    char* ptr;
-//    short uTemp = cNum;
-//    unsigned short length;
-//
-//    // value 0 is a special case
-//    if (cNum == 0)
-//    {
-//        length = 1;
-//        *cString = '0';
-//
-//        return length;
-//    }
-//
-//    // Find out the length of the number, in decimal base
-//    length = 0;
-//    while (uTemp > 0)
-//    {
-//        uTemp /= 10;
-//        length++;
-//    }
-//
-//    // Do the actual formatting, right to left
-//    uTemp = cNum;
-//    ptr = cString + length;
-//    while (uTemp > 0)
-//    {
-//        --ptr;
-//        *ptr = pcDigits[uTemp % 10];
-//        uTemp /= 10;
-//    }
-//
-//    return length;
-//}
+unsigned short itoa(short cNum, char *cString)
+{
+    char* ptr;
+    short uTemp = cNum;
+    unsigned short length;
+
+    // value 0 is a special case
+    if (cNum == 0)
+    {
+        length = 1;
+        *cString = '0';
+
+        return length;
+    }
+
+    // Find out the length of the number, in decimal base
+    length = 0;
+    while (uTemp > 0)
+    {
+        uTemp /= 10;
+        length++;
+    }
+
+    // Do the actual formatting, right to left
+    uTemp = cNum;
+    ptr = cString + length;
+    while (uTemp > 0)
+    {
+        --ptr;
+        *ptr = pcDigits[uTemp % 10];
+        uTemp /= 10;
+    }
+
+    return length;
+}
 
 //*****************************************************************************
 //
