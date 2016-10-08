@@ -22,6 +22,7 @@ endif
 ifeq (,$(EXE_NAME))
 	$(error EXE_NAME must be defined!)
 endif
+
 USE_LIBS ?= driverlib
 
 LDSCRIPT ?= $(SDK_ROOT)/example/common/gcc/cc3200r1m2.ld
@@ -53,41 +54,22 @@ CFLAGS_COMMON=-mthumb       \
 RELEASE_CFLAGS=-Os -DTARGET_IS_CC3200
 DEBUG_CFLAGS=-O0
 
-DEBUG_LDLIBS=
-RELEASE_LDLIBS=
-
 include $(USE_LIBS:%=$(SDK_ROOT)/example/common/gcc/%.inc)
 
 CFLAGS_COMMON += $(IPATH)
 
-LIBGCC=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libgcc.a")
 LIBC_TYPE ?= nano
-ifeq (nano, $(LIBC_TYPE))
-    LIBC=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libnosys.a")
-    LIBC+=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libc_nano.a")
-else
-    LIBC=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libc.a")
-endif
+LIBGCC=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libgcc.a")
+LIBNOSYS=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libnosys.a")
+LIBC_NANO=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libc_nano.a")
+LIBC=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libc.a")
 LIBM=$(shell $(CC) $(CFLAGS_COMMON) "-print-file-name=libm.a")
-ifeq (,LIBGCC)
-	$(error libgcc.a not found!)
-endif
-ifeq (,LIBC)
-    ifeq (,LIBNOSYS)
-            $(error libnosys.a not found!)
-    endif
-    ifeq (nano, $(LIBC_TYPE))
-	$(error libc_nano.a not found!)
-    else
-	$(error libc.a not found!)
-    endif
-endif
-ifeq (,LIBM)
-	$(error libm.a not found!)
-endif
 
-DEBUG_LDLIBS += "$(LIBC)" "$(LIBM)" "$(LIBGCC)"
-RELEASE_LDLIBS += "$(LIBC)" "$(LIBM)" "$(LIBGCC)"
+ifeq (nano,$(LIBC_TYPE))
+    STDLIBS="$(LIBC_NANO)" "$(LIBM)" "$(LIBGCC)" "$(LIBNOSYS)"
+else
+    STDLIBS="$(LIBC)" "$(LIBM)" "$(LIBGCC)"
+endif
 
 DEBUG_BINARY=bin/Debug/$(EXE_NAME).bin
 DEBUG_ELF=bin/Debug/$(EXE_NAME).elf
@@ -129,12 +111,12 @@ $(RELEASE_OBJPATH)/%.o: %.c Makefile
 # *.elf build rules
 $(DEBUG_ELF): $(DEBUG_OBJECTS)
 	$(dir_create)
-	@${LD} -T$(LDSCRIPT) -Map $(@:%.elf=%.map) --entry $(ENTRY_POINT) --gc-sections -o $@ $(DEBUG_OBJECTS) $(DEBUG_LDLIBS)
+	@${LD} -T$(LDSCRIPT) -Map $(@:%.elf=%.map) --entry $(ENTRY_POINT) --gc-sections -o $@ $(DEBUG_OBJECTS) $(DEBUG_LDLIBS) $(STDLIBS)
 	@echo "LD	$@";
 
 $(RELEASE_ELF): $(RELEASE_OBJECTS)
 	$(dir_create)
-	@${LD} -T$(LDSCRIPT) -Map $(@:%.elf=%.map) --entry $(ENTRY_POINT) --gc-sections -o $@ $(RELEASE_OBJECTS) $(RELEASE_LDLIBS)
+	@${LD} -T$(LDSCRIPT) -Map $(@:%.elf=%.map) --entry $(ENTRY_POINT) --gc-sections -o $@ $(RELEASE_OBJECTS) $(RELEASE_LDLIBS) $(STDLIBS)
 	@echo "LD	$@";
 
 # *.bin build rules
@@ -157,16 +139,16 @@ clean_debug:
 	@echo "rm -rf $(DEBUG_OBJPATH)/*.d";
 	@rm -rf $(DEBUG_OBJPATH)/*.o
 	@echo "rm -rf $(DEBUG_OBJPATH)/*.o";
-	@rm -rf $(DEBUG_LIBRARY)
-	@echo "rm -rf $(DEBUG_LIBRARY)";
+	@rm -rf $(DEBUG_BINARY) $(DEBUG_ELF) $(DEBUG_ELF:%.elf=%.map)
+	@echo "rm -rf $(DEBUG_BINARY) $(DEBUG_ELF) $(DEBUG_ELF:%.elf=%.map)";
 
 clean_release:
 	@rm -rf $(RELEASE_OBJPATH)/*.d
 	@echo "rm -rf $(RELEASE_OBJPATH)/*.d";
 	@rm -rf $(RELEASE_OBJPATH)/*.o
 	@echo "rm -rf $(RELEASE_OBJPATH)/*.o";
-	@rm -rf $(RELEASE_LIBRARY)
-	@echo "rm -rf $(RELEASE_LIBRARY)";
+	@rm -rf $(RELEASE_BINARY) $(RELEASE_ELF) $(RELEASE_ELF:%.elf=%.map)
+	@echo "rm -rf $(RELEASE_BINARY) $(RELEASE_ELF) $(RELEASE_ELF:%.elf=%.map)";
 
 clean: clean_debug clean_release
 
