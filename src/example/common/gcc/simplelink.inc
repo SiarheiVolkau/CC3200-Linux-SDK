@@ -9,7 +9,7 @@
 
 SL_PATH ?= $(SDK_ROOT)/simplelink
 
-IPATH += -I$(SDK_ROOT)/simplelink/include
+IPATH += -I$(SL_PATH)/include
 
 ifeq (,$(findstring oslib,$(USE_LIBS)))
     DEBUG_LDLIBS+='$(SL_PATH)/gcc/lib/nonos/Debug/libsimplelink.a'
