@@ -92,7 +92,7 @@ CPUipsr(void)
 #endif
 
 #if defined(gcc)
-u32
+u32 __attribute__((naked))
 CPUipsr(void)
 {
     //

@@ -314,9 +314,9 @@ void PrintIPAddr(unsigned int uiIpaddr)
     ucLen2 = sprintf((pcIpString + ucLen1), ".%u", (uiIpaddr & 0x00FF0000)>>16);
     ucLen3 = sprintf((pcIpString + ucLen1 + ucLen2), ".%u",
                      (uiIpaddr & 0x0000FF00)>>8);
-    ucLen4 = sprintf((pcIpString + ucLen1 + ucLen2 + ucLen3), ".%u\0",
+    ucLen4 = sprintf((pcIpString + ucLen1 + ucLen2 + ucLen3), ".%u",
                      (uiIpaddr & 0x000000FF));
-    UNUSED(ucLen4);
+    pcIpString[ucLen1+ucLen2+ucLen3+ucLen4] = '\0';
     UART_PRINT(pcIpString);
 }
 
@@ -994,7 +994,7 @@ void UDPServerTask(void *pvParameters)
 //****************************************************************************
 //                            MAIN FUNCTION
 //****************************************************************************
-void main(void)
+int main(void)
 {
     int iRetVal;
     //
@@ -1073,4 +1073,5 @@ void main(void)
     //
     osi_start();
 
+    return 0;
 }
