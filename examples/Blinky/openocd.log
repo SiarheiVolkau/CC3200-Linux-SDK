@@ -1,7 +1,0 @@
-Info : only one transport option; autoselect 'jtag'
-adapter speed: 1000 kHz
-cc3200_dbginit
-Error: libusb_open() failed with LIBUSB_ERROR_ACCESS
-Error: no device found
-Error: unable to open ftdi device with vid 0451, pid c32a, description 'USB <-> JTAG/SWD' and serial '*'
-in procedure 'init'
