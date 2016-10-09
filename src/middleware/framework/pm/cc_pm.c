@@ -354,7 +354,12 @@ static i32 do_try_S3_no_irq()
         return 0;
 }
 
-i32 try_S3_no_irq(void)
+i32
+/* Hack for make S3 working when gcc optimization disabled */
+#ifdef gcc
+__attribute__((optimize("Os")))
+#endif
+try_S3_no_irq(void)
 {
 #define PFORM_CAN_TRY_S3() ((NULL != pform->pm_ops->enter_S3)        && \
                             pform->pm_ops->can_try_pm_state(e_pm_S3))
