@@ -74,6 +74,7 @@
 #include "uart_if.h"
 #endif
 #include "common.h"
+#include "pinmux.h"
 
 
 #define APPLICATION_VERSION     "1.1.1"
@@ -98,8 +99,12 @@ unsigned long  g_ulGatewayIP = 0; //Network Gateway IP address
 unsigned char  g_ucConnectionSSID[SSID_LEN_MAX+1]; //Connection SSID
 unsigned char  g_ucConnectionBSSID[BSSID_LEN_MAX]; //Connection BSSID
 
+#if defined(ccs) || defined(gcc)
 extern void (* const g_pfnVectors[])(void);
-
+#endif
+#if defined(ewarm)
+extern uVectorEntry __vector_table;
+#endif
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
@@ -176,8 +181,8 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
             pEventData = &pWlanEvent->EventData.STAandP2PModeDisconnected;
 
             // If the user has initiated 'Disconnect' request,
-            //'reason_code' is SL_USER_INITIATED_DISCONNECTION
-            if(SL_USER_INITIATED_DISCONNECTION == pEventData->reason_code)
+            //'reason_code' is SL_WLAN_DISCONNECT_USER_INITIATED_DISCONNECTION
+            if(SL_WLAN_DISCONNECT_USER_INITIATED_DISCONNECTION == pEventData->reason_code)
             {
                 UART_PRINT("[WLAN EVENT]Device disconnected from the AP: %s,"
                 "BSSID: %x:%x:%x:%x:%x:%x on application's request \n\r",
@@ -708,11 +713,17 @@ static void
 BoardInit(void)
 {
 /* In case of TI-RTOS vector table is initialize by OS itself */
+#ifndef USE_TIRTOS
     //
     // Set vector table base
     //
+#if defined(gcc) || defined(ccs)
     MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
-
+#endif
+#if defined(ewarm)
+    MAP_IntVTableBaseSet((unsigned long)&__vector_table);
+#endif
+#endif
     //
     // Enable Processor
     //
@@ -730,6 +741,11 @@ int main(void)
     // Initialize Board configurations
     //
     BoardInit();
+
+#ifndef NOTERM
+    PinMuxConfig();
+    InitTerm();
+#endif
 
     InitializeAppVariables();
     //
