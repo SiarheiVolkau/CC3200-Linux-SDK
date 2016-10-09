@@ -105,7 +105,12 @@ volatile static bool g_bContextInIntFlag;
 static volatile bool g_bDataInIntFlag;
 static volatile bool g_bDataOutIntFlag;
 
+#if defined(gcc) || defined(ccs)
 extern void (* const g_pfnVectors[])(void);
+#endif
+#if defined(ewarm)
+extern uVectorEntry __vector_table;
+#endif
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -345,11 +350,17 @@ static void
 BoardInit(void)
 {
 /* In case of TI-RTOS vector table is initialize by OS itself */
+#ifndef USE_TIRTOS
     //
     // Set vector table base
     //
+#if defined(gcc) || defined(ccs)
     MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
-
+#endif
+#if defined(ewarm)
+    MAP_IntVTableBaseSet((unsigned long)&__vector_table);
+#endif
+#endif
     //
     // Enable Processor
     //
@@ -370,7 +381,7 @@ BoardInit(void)
 //! \return None
 //
 //*****************************************************************************
-void 
+int 
 main()
 {
   
@@ -490,7 +501,7 @@ main()
     
     while(FOREVER);
 #endif
-  
+  return 0;
 }
 //*****************************************************************************
 //
