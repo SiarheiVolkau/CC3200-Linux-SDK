@@ -19,7 +19,7 @@ EXE_NAME=antenna_selection
 
 USE_LIBS=simplelink oslib driverlib
 
-#use full libc for float printing, used in this example
+#for use full libc (for float printing), use `full`
 #default is `nano`
 LIBC_TYPE=nano
 
