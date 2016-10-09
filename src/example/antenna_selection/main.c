@@ -61,6 +61,8 @@
 #endif
 #include "common.h"
 
+#include "pinmux.h"
+
 #define APPLICATION_NAME        "Antenna Selection"
 #define APPLICATION_VERSION     "1.1.1"
 #define SUCCESS                 0
@@ -105,7 +107,13 @@ typedef enum{
 
 volatile unsigned char  g_ulStatus = 0;
 
+#if defined(gcc) || defined(ccs)
 extern void (* const g_pfnVectors[])(void);
+#endif
+
+#if defined(ewarm)
+extern uVectorEntry __vector_table;
+#endif
 
 volatile unsigned char g_ucProfileAdded = 1;
 unsigned char g_ucConnectedToConfAP = 0;
@@ -154,7 +162,7 @@ static long ConfigureSimpleLinkToDefaultState();
 static void BoardInit(void);
 static void SetAntennaSelectionGPIOs(void);
 static long WlanConnect(void);
-static void AntennaSelect(unsigned char ucAnt);
+static void AntennaSelect(unsigned char ucAntNum);
 static void SortByRSSI(Sl_WlanNetworkEntry_t* netEntries, unsigned char ucSSIDCount);
 static int GetScanResult(Sl_WlanNetworkEntry_t* netEntries );
 static unsigned char getRSSILevel(signed char rssi,char** pucRssiImg);
@@ -295,8 +303,8 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
             pEventData = &pWlanEvent->EventData.STAandP2PModeDisconnected;
 
             // If the user has initiated 'Disconnect' request,
-            //'reason_code' is SL_USER_INITIATED_DISCONNECTION
-            if(SL_USER_INITIATED_DISCONNECTION == pEventData->reason_code)
+            //'reason_code' is SL_WLAN_DISCONNECT_USER_INITIATED_DISCONNECTION
+            if(SL_WLAN_DISCONNECT_USER_INITIATED_DISCONNECTION == pEventData->reason_code)
             {
                 UART_PRINT("[WLAN EVENT]Device disconnected from the AP: %s,"
                 "BSSID: %x:%x:%x:%x:%x:%x on application's request \n\r",
@@ -795,7 +803,6 @@ void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
     }
 
 }
-
 
 //*****************************************************************************
 // SimpleLink Asynchronous Event Handlers -- End
@@ -1389,6 +1396,25 @@ static unsigned char getRSSILevel(signed char rssi,char** pucRssiImg)
 
 //*****************************************************************************
 //
+//! Application startup display on UART
+//!
+//! \param  none
+//!
+//! \return none
+//!
+//*****************************************************************************
+static void
+DisplayBanner(char * AppName)
+{
+    Report("\n\n\n\r");
+    Report("\t\t *************************************************\n\r");
+    Report("\t\t       CC3200 %s Application       \n\r", AppName);
+    Report("\t\t *************************************************\n\r");
+    Report("\n\n\n\r");
+}
+
+//*****************************************************************************
+//
 //! Board Initialization & Configuration
 //!
 //! \param  None
@@ -1400,7 +1426,12 @@ static void
 BoardInit(void)
 {
 
-	MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
+#if defined(gcc) || defined(ccs)
+    MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
+#endif
+#if defined(ewarm)
+    MAP_IntVTableBaseSet((unsigned long)&__vector_table);
+#endif
     
     //
     // Enable Processor
@@ -1477,14 +1508,20 @@ static void SetAntennaSelectionGPIOs(void)
 //! \return None.
 //
 //****************************************************************************
-void main()
+int main()
 {
     long lRetVal = -1;
 
     //
     // Initialize Board configurations
     //
-    BoardInit();   
+    BoardInit();
+    
+    PinMuxConfig();
+
+    InitTerm();
+    ClearTerm();
+    DisplayBanner(APPLICATION_NAME);
 
     //
     // Confugure GPIOs for Antenna Selection
