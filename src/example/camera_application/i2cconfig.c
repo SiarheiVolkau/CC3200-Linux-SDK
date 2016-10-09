@@ -52,8 +52,6 @@
 #include "i2cconfig.h"
 
 
-void MT9D111Delay(unsigned long ucDelay);
-
 //*****************************************************************************
 //
 //! This function implements delay in the camera sensor
@@ -63,14 +61,32 @@ void MT9D111Delay(unsigned long ucDelay);
 //! \return                     None
 //
 //*****************************************************************************
+#if defined(ewarm)
+    void MT9D111Delay(unsigned long ucDelay)
+    {
+    __asm("    subs    r0, #1\n"
+          "    bne.n   MT9D111Delay\n"
+          "    bx      lr");
+    }
+#endif
+#if defined(ccs)
 
     __asm("    .sect \".text:MT9D111Delay\"\n"
+          "    .clink\n"
+          "    .thumbfunc MT9D111Delay\n"
           "    .thumb\n"
           "    .global MT9D111Delay\n"
           "MT9D111Delay:\n"
           "    subs r0, #1\n"
           "    bne.n MT9D111Delay\n"
           "    bx lr\n");
+
+#endif
+
+#if defined(gcc)
+#include "utils.h"
+#define MT9D111Delay MAP_UtilsDelay
+#endif
 
 //*****************************************************************************
 //

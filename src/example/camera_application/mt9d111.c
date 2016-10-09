@@ -295,8 +295,14 @@ static  const s_RegList init_cmds_list[]= {
 // Static Function Declarations
 //*****************************************************************************
 static long RegLstWrite(s_RegList *pRegLst, unsigned long ulNofItems);
+#if defined(ewarm)
 extern void MT9D111Delay(unsigned long ucDelay);
+#endif
 
+#if defined(gcc)
+#include "utils.h"
+#define MT9D111Delay MAP_UtilsDelay
+#endif
 
 //*****************************************************************************
 //
