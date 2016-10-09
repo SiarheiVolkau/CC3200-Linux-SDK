@@ -94,8 +94,12 @@
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
 //*****************************************************************************
+#if defined(gcc) || defined(ccs)
 extern void (* const g_pfnVectors[])(void);
-
+#endif
+#if defined(ewarm)
+extern uVectorEntry __vector_table;
+#endif
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
 //*****************************************************************************
@@ -172,15 +176,16 @@ LoadDefaultValues(unsigned int ui32Config,unsigned int *uiConfig,unsigned int
     // Read Seed Value
     //
     *uiSeed=g_psCRC8005TestVectors.ui32Seed;
-    puiResult=(unsigned int*)malloc(4);
-    memset(puiResult,0,4);
+    *puiResult = 0;
     uiData=(unsigned int*)malloc(64);
+    if(uiData != NULL)
+    {
     memset(uiData,0,64);
     //
     // Read the Data
     //
     memcpy(uiData,g_psCRC8005TestVectors.ui32Data,64);
-
+    }
     return uiData; 
    
 }
@@ -217,11 +222,17 @@ static void
 BoardInit(void)
 {
 /* In case of TI-RTOS vector table is initialize by OS itself */
+#ifndef USE_TIRTOS
     //
     // Set vector table base
     //
+#if defined(gcc) || defined(ccs)
     MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
-
+#endif
+#if defined(ewarm)
+    MAP_IntVTableBaseSet((unsigned long)&__vector_table);
+#endif
+#endif
     //
     // Enable Processor
     //
@@ -307,6 +318,10 @@ main()
         // Display Plain Text
         //
         UART_PRINT("\n\r The CRC Result in hex is: 0x%02x \n\r",uiResult);
+        if(puiData)
+        {
+            free(puiData);
+        }
     }
 #else
     //
