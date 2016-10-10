@@ -163,8 +163,12 @@ Everywhere a cluck-cluck. \
 Old MacDonald had a farm, \
 E-I-E-I-O.";
 
-
+#if defined(gcc) || defined(ccs)
 extern void (* const g_pfnVectors[])(void);
+#endif
+#if defined(ewarm)
+extern uVectorEntry __vector_table;
+#endif
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End
@@ -223,6 +227,20 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent)
 
 //*****************************************************************************
 //
+//! \brief This function handles General Events
+//!
+//! \param[in]     pDevEvent - Pointer to General Event Info
+//!
+//! \return None
+//!
+//*****************************************************************************
+void SimpleLinkGeneralEventHandler(SlDeviceEvent_t *pDevEvent)
+{
+
+}
+
+//*****************************************************************************
+//
 //! This function handles socket events indication
 //!
 //! \param[in]      pSock - Pointer to Socket Event Info
@@ -234,6 +252,7 @@ void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
 {
 
 }
+
 
 //*****************************************************************************
 // SimpleLink Asynchronous Event Handlers -- End
@@ -252,11 +271,17 @@ static void
 BoardInit(void)
 {
     // In case of TI-RTOS vector table is initialize by OS itself
+#ifndef USE_TIRTOS
     //
     // Set vector table base
     //
+#if defined(gcc) || defined(ccs)
     MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
-
+#endif
+#if defined(ewarm)
+    MAP_IntVTableBaseSet((unsigned long)&__vector_table);
+#endif
+#endif
     //
     // Enable Processor
     //
@@ -453,6 +478,11 @@ void main()
     //
     PinMuxConfig();
 
+#ifndef NOTERM
+    InitTerm();
+    ClearTerm();
+#endif
+    
     //
     // Configure LEDs
     //
@@ -469,6 +499,9 @@ void main()
     if(lRetVal < 0)
     {
         GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+#ifndef NOTERM
+        UART_PRINT("sl_Start failed.\r\n");
+#endif
         LOOP_FOREVER();
     }
 
@@ -482,18 +515,27 @@ void main()
     if(lRetVal < 0)
     {
         GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+#ifndef NOTERM
+        UART_PRINT("sl_WlanPolicySet failed.\r\n");
+#endif
         LOOP_FOREVER();
     }
     
     if(WriteFileToDevice(&ulToken, &lFileHandle) < 0)
     {
         GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+#ifndef NOTERM
+        UART_PRINT("WriteFileToDevice failed.\r\n");
+#endif
         LOOP_FOREVER();
     }
 
     if(ReadFileFromDevice(ulToken, lFileHandle) < 0)
     {
         GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+#ifndef NOTERM
+        UART_PRINT("ReadFileFromDevice failed.\r\n");
+#endif
          LOOP_FOREVER();
     }
 
@@ -503,6 +545,9 @@ void main()
     GPIO_IF_LedOn(MCU_GREEN_LED_GPIO);
     lRetVal = sl_Stop(SL_STOP_TIMEOUT);
 
+#ifndef NOTERM
+    UART_PRINT("File operations succeeds.\r\n");
+#endif
        LOOP_FOREVER();
 
 }
