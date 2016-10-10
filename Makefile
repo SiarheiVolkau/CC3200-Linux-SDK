@@ -6,8 +6,26 @@
 #
 #*****************************************************************************
 
-SDK_LIBS = driverlib simplelink oslib middleware
-SDK_EXAMPLES = driverlib simplelink oslib middleware
+SDK_LIBS = driverlib           \
+           simplelink          \
+           oslib               \
+           middleware          \
+           netapps/http/client \
+           netapps/json        \
+
+SDK_EXAMPLES = adc                \
+               aes                \
+               antenna_selection  \
+               blinky             \
+               camera_application \
+               connection_policy  \
+               crc                \
+               des                \
+               file_download      \
+               freertos_demo      \
+               get_time           \
+               idle_profile       \
+
 
 .PHONY: all clean
 
