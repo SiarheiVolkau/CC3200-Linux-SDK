@@ -65,7 +65,7 @@ SOURCES= osi_freertos.c \
 	tasks.c         \
 	port.c          \
 	timers.c        \
-	heap_4.c
+	heap_3.c
 
 vpath %.c $(SRC_ROOT):$(RTOSDIR):$(RTOSDIR)/portable/GCC/ARM_CM4:$(RTOSDIR)/portable/MemMang
 
