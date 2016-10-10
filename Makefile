@@ -12,6 +12,7 @@ SDK_LIBS = driverlib           \
            middleware          \
            netapps/http/client \
            netapps/json        \
+           netapps/mqtt        \
 
 SDK_EXAMPLES = adc                \
                aes                \
