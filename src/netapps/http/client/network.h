@@ -45,11 +45,10 @@
 
 #elif defined(__SL__) /* __linux__ */
 #include <simplelink.h>
-#include <stdio.h>
 
 #ifndef  __ssize_t_defined
 #define __ssize_t_defined
-//typedef long int ssize_t;
+typedef long int ssize_t;
 
 #endif /* __ssize_t_defined */
 
