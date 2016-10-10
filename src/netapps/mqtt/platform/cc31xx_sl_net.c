@@ -159,11 +159,13 @@ static _i32 create_socket(_u32 nwconn_opts, struct secure_conn *nw_security_opts
 
 static _u32 svr_addr_NB_order_IPV4(char *svr_addr_str)
 {
-    _u8 addr[4];
     _i8 i = 0;
     char *token;
-    _u32 svr_addr;
     _i32 temp;
+    union {
+        _u8 addr[4];
+        _u32 svr_addr;
+    }addr;
 
     /*take a temporary copy of the string. strtok modifies the input string*/
     _i8 svr_addr_size = strlen(svr_addr_str);
@@ -187,7 +189,7 @@ static _u32 svr_addr_NB_order_IPV4(char *svr_addr_str)
             return (0);
         }
 
-        addr[i++] = (_u8) temp;
+        addr.addr[i++] = (_u8) temp;
         token = strtok(NULL, ".");
     }
 
@@ -197,11 +199,9 @@ static _u32 svr_addr_NB_order_IPV4(char *svr_addr_str)
         return (0);
     }
 
-    //form address if above test passed
-    svr_addr = *((_u32 *) &addr);
     free(svr_addr_cpy);
 
-    return (svr_addr);
+    return (addr.svr_addr);
 
 } // end of function
 
