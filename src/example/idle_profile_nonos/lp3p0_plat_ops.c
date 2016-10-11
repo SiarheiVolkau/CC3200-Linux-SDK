@@ -209,7 +209,7 @@ void enable_peripherals()
 	UDMAInit();
     
     //Initialising the link SPI
-	spi_Open(NULL, NULL);
+	spi_Open(NULL, 0);
 	
     //Initialising the UART terminal
     InitTerm();
@@ -227,6 +227,8 @@ void lp3p0_restore_soc_data(void)
 {       
         /* Invoking the default CC3xxx service impl. */
         cc_restore_soc_data();
+		
+		PRCMCC3200MCUInit();
 
         /* disabling all wk up srcs */
         PRCMLPDSWakeupSourceDisable(PRCM_LPDS_HOST_IRQ|PRCM_LPDS_GPIO|PRCM_LPDS_TIMER);
