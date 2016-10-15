@@ -66,7 +66,9 @@ SECTIONS
 							- SIZEOF(.data)
 							- SIZEOF(.ARM)
 							- SIZEOF(.text)
-							- SIZEOF(.bootloader);
+							- SIZEOF(.bootloader)
+							- 1024;
+		. = ALIGN(1024);
 		_eheap = .;
 	} > SRAM
 }
