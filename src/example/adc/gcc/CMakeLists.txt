@@ -5,11 +5,16 @@
 # type following commands in console for build project
 #   mkdir build && cd build
 #   cmake -DCMAKE_BUILD_TYPE=<Debug|Release> ..
-#   make
+#   cmake --build .
 #
 ########################################################################
 
 cmake_minimum_required(VERSION 2.6)
+
+set(CC3200_SDK_ROOT "../../..")
+set(CC3200_EXAMPLE_COMMON_PATH "${CC3200_SDK_ROOT}/example/common")
+
+set(CMAKE_TOOLCHAIN_FILE ${CC3200_EXAMPLE_COMMON_PATH}/gcc/compiler.cmake)
 
 # name of the final binary files
 set(TARGET_NAME "adc")
@@ -18,11 +23,13 @@ project(${TARGET_NAME} C)
 
 # define required variable for
 # common part of build script
-set(CC3200_SDK_ROOT "../../..")
 set(CC3200_USE_LIBS "driverlib")
 set(NEWLIB "full")
 
-set(CC3200_EXAMPLE_COMMON_PATH "${CC3200_SDK_ROOT}/example/common")
+# use this for cc3200r1m1 devices
+# set(CC3200_SRAM_SIZE "128K")
+
+
 include(${CC3200_EXAMPLE_COMMON_PATH}/gcc/common.cmake)
 
 set(CC3200_PROJECT_ROOT "..")

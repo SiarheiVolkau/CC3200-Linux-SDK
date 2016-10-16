@@ -1,43 +1,16 @@
 #
-# Copyright 2014-2016 CyberVision, Inc.
+# use specific compiler flags
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+set(CPU_FLAGS "-mthumb -mcpu=cortex-m4")
+set(CMAKE_C_FLAGS "${CPU_FLAGS} -ffunction-sections -fdata-sections -g -Wall -Dgcc")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -O0" CACHE STRING "Debug compiler flags" FORCE)
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -Os -DTARGET_IS_CC3200" CACHE STRING "Release compiler flags" FORCE)
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS} -Os -DTARGET_IS_CC3200")
+set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS} -Os -DTARGET_IS_CC3200")
+
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
-include(CMakeForceCompiler)
-
-set(CMAKE_SYSTEM_NAME Generic)
-
-set(ARM_GCC_COMPILER "arm-none-eabi-gcc${CMAKE_EXECUTABLE_SUFFIX}")
-
-# Find toolchain path
-
-if (NOT DEFINED ENV{CC32XX_TOOLCHAIN_PATH})
-  # Check if GCC is reachable.
-  find_path(TOOLCHAIN_PATH bin/${ARM_GCC_COMPILER})
-
-  if (NOT TOOLCHAIN_PATH)
-    # Set default path.
-    set(TOOLCHAIN_PATH "/usr/bin/gcc-arm-none-eabi")
-    message(STATUS "GCC not found, default path will be used")
-  endif ()
-else ()
-  set(TOOLCHAIN_PATH "$ENV{CC32XX_TOOLCHAIN_PATH}")
-  message(STATUS "Toolchain path is provided: ${TOOLCHAIN_PATH}")
-endif ()
-
 # Find CC32XX SDK
-
+#
 if (NOT DEFINED CC3200_SDK_ROOT)
   message(ERROR "SDK location is not defined (CC3200_SDK_ROOT)")
 else ()
@@ -47,14 +20,11 @@ endif ()
 
 message(STATUS "CC32XX SDK path: ${CC3200_SDK_ROOT}")
 message(STATUS "Toolchain path: ${TOOLCHAIN_PATH}")
-
 include_directories(${CC3200_SDK_ROOT}/inc)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
 	set(CC3200_LIB_TYPE "Debug")
-	set(PROJECT_CFLAGS "-Dgcc -O0 ${PROJECT_CFLAGS}")
 else ()
-	set(PROJECT_CFLAGS "-Dgcc -DTARGET_IS_CC3200 -Os ${PROJECT_CFLAGS}")
 	set(CC3200_LIB_TYPE "Release")
 endif ()
 
@@ -66,7 +36,7 @@ if (CC3200_USE_LIBS MATCHES "middleware")
 endif()
 
 #
-# include specific libs
+# include requested libs
 #
 if (CC3200_USE_LIBS MATCHES "driverlib")
 	message(STATUS "Using driverlib library.")
@@ -112,62 +82,36 @@ if (CC3200_USE_LIBS MATCHES "simplelink")
 	endif()
 endif()
 
-# Specify target's environment
-set(CMAKE_FIND_ROOT_PATH "${TOOLCHAIN_PATH}/arm-none-eabi/")
-
-set(CMAKE_C_COMPILER   "${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc${CMAKE_EXECUTABLE_SUFFIX}")
-set(CMAKE_CXX_COMPILER "${TOOLCHAIN_PATH}/bin/arm-none-eabi-g++${CMAKE_EXECUTABLE_SUFFIX}")
-set(CMAKE_C_LINKER     "${TOOLCHAIN_PATH}/bin/arm-none-eabi-ld${CMAKE_EXECUTABLE_SUFFIX}")
-set(CMAKE_CXX_LINKER   "${TOOLCHAIN_PATH}/bin/arm-none-eabi-ld${CMAKE_EXECUTABLE_SUFFIX}")
-set(CMAKE_OBJCOPY
-        "${TOOLCHAIN_PATH}/bin/arm-none-eabi-objcopy${CMAKE_EXECUTABLE_SUFFIX}"
-        CACHE STRING "Objcopy" FORCE)
-
-CMAKE_FORCE_C_COMPILER(${CMAKE_C_COMPILER} GNU)
-CMAKE_FORCE_CXX_COMPILER(${CMAKE_CXX_COMPILER} GNU)
-
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
-
-set(CPU_FLAGS "-mthumb -mcpu=cortex-m4")
-set(CMAKE_C_FLAGS "${CPU_FLAGS} -ffunction-sections -fdata-sections -g -Wall ${PROJECT_CFLAGS}" CACHE STRING "C flags" FORCE)
-
 set(CC3200_SDK_ROOT "${CC3200_SDK_ROOT}" CACHE STRING "SDK location" FORCE)
-
-set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)    # remove -rdynamic
-set(CMAKE_EXE_LINK_DYNAMIC_C_FLAGS)       # remove -Wl,-Bdynamic
-
-execute_process(COMMAND ${CMAKE_C_COMPILER} "-mthumb" "-mcpu=cortex-m4" "-print-file-name=libgcc.a" OUTPUT_VARIABLE LIBGCC_PATH)
-string(STRIP "${LIBGCC_PATH}" LIBGCC_PATH)
-execute_process(COMMAND ${CMAKE_C_COMPILER} "-mthumb" "-mcpu=cortex-m4" "-print-file-name=libnosys.a" OUTPUT_VARIABLE LIBNOSYS_PATH)
-string(STRIP "${LIBNOSYS_PATH}" LIBNOSYS_PATH)
-execute_process(COMMAND ${CMAKE_C_COMPILER} "-mthumb" "-mcpu=cortex-m4" "-print-file-name=libc_nano.a" OUTPUT_VARIABLE LIBC_NANO_PATH)
-string(STRIP "${LIBC_NANO_PATH}" LIBC_NANO_PATH)
-execute_process(COMMAND ${CMAKE_C_COMPILER} "-mthumb" "-mcpu=cortex-m4" "-print-file-name=libc.a" OUTPUT_VARIABLE LIBC_PATH)
-string(STRIP "${LIBC_PATH}" LIBC_PATH)
-execute_process(COMMAND ${CMAKE_C_COMPILER} "-mthumb" "-mcpu=cortex-m4" "-print-file-name=libm.a" OUTPUT_VARIABLE LIBM_PATH)
-string(STRIP "${LIBM_PATH}" LIBM_PATH)
 
 #
 # use newlib or newlib-nano
+# default is newlib-nano (declared in compiler.cmake)
 #
-if (NEWLIB MATCHES full)
+if (NEWLIB STREQUAL full)
 	set(STDLIBS "'${LIBC_PATH}' '${LIBM_PATH}' '${LIBGCC_PATH}'")
-else ()
-	set(STDLIBS "'${LIBC_NANO_PATH}' '${LIBM_PATH}' '${LIBGCC_PATH}' '${LIBNOSYS_PATH}'")
+else()
+	set(NEWLIB nano)
 endif ()
 
+set(NEWLIB "${NEWLIB}" CACHE STRING "Newlib variant: nano or full (default)." FORCE)
+
 #
-# use default or provided linker script
+# use specific linker script
+# default is the script for 256K devices
 #
-if (NOT DEFINED LINKER_SCRIPT)
+if (CC3200_SRAM_SIZE STREQUAL 128K)
+	set(LINKER_SCRIPT "${CC3200_SDK_ROOT}/example/common/gcc/cc3200r1m1.ld")
+else ()
+	set(CC3200_SRAM_SIZE 256K)
 	set(LINKER_SCRIPT "${CC3200_SDK_ROOT}/example/common/gcc/cc3200r1m2.ld")
 endif ()
+
+set(CC3200_SRAM_SIZE "${CC3200_SRAM_SIZE}" CACHE STRING "SRAM size on target: 128K or 256K (default)." FORCE)
 
 #
 # linker commandline
 #
 set(CMAKE_C_LINK_EXECUTABLE
-        "${CMAKE_C_LINKER} -T${LINKER_SCRIPT} -Map output.map --entry ResetISR --gc-sections -o <TARGET> <OBJECTS> <LINK_LIBRARIES> ${LINK_LIBS} ${STDLIBS}")
+        "${CMAKE_C_LINKER} -T${LINKER_SCRIPT} -Map <TARGET>.map --entry ResetISR --gc-sections -o <TARGET> <OBJECTS> <LINK_LIBRARIES> ${LINK_LIBS} ${STDLIBS}")
+

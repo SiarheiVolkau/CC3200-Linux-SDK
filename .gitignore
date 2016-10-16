@@ -1,2 +1,6 @@
 *.o
 *.d
+*.map
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
