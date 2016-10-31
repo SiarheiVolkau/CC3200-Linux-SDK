@@ -1,6 +1,6 @@
 #******************************************************************************
 #
-# Makefile - Rules for building the Osi library.
+# Makefile - Rules for building the JSON library.
 #
 #	v- 1.2.0
 #
@@ -18,7 +18,7 @@ SRC_ROOT=..
 OUTDIR=lib
 
 # Lib Name
-LIBRARY=json.a
+LIBRARY=libjson.a
 DEBUG_LIBRARY=$(OUTDIR)/Debug/${LIBRARY}
 RELEASE_LIBRARY=$(OUTDIR)/Release/${LIBRARY}
 
