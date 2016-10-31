@@ -1,6 +1,6 @@
 #******************************************************************************
 #
-# Makefile - Rules for building the Osi library.
+# Makefile - Rules for building the JSON library.
 #
 #	v- 1.2.0
 #

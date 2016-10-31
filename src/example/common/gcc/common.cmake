@@ -82,6 +82,14 @@ if (CC3200_USE_LIBS MATCHES "simplelink")
 	endif()
 endif()
 
+if (CC3200_USE_LIBS MATCHES "json")
+	message(STATUS "Using JSON library.")
+	set(LINK_LIBS "'${CC3200_SDK_ROOT}/netapps/json/gcc/lib/${CC3200_LIB_TYPE}/libjson.a' ${LINK_LIBS}")
+	include_directories(${CC3200_SDK_ROOT}/netapps/json)
+endif()
+
+
+
 set(CC3200_SDK_ROOT "${CC3200_SDK_ROOT}" CACHE STRING "SDK location" FORCE)
 
 #
