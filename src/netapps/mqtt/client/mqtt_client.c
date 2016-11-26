@@ -1489,6 +1489,7 @@ i32 proc_ctx_data_recv(struct client_ctx *cl_ctx, struct mqtt_packet *mqp,
 
         rv = net_recv(net, mqp, wait_secs, (void*)cl_ctx);
 
+		lock_lpds_entering();
         MUTEX_LOCKIN();
 
         if(rv > 0)
@@ -1505,6 +1506,7 @@ i32 proc_ctx_data_recv(struct client_ctx *cl_ctx, struct mqtt_packet *mqp,
                 do_net_close_rx(cl_ctx, rv);
 
         MUTEX_UNLOCK();
+		unlock_lpds_entering();
 
         return rv;
 }

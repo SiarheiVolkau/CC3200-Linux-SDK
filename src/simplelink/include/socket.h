@@ -344,6 +344,9 @@ extern "C" {
 
 #ifdef SL_INC_STD_BSD_API_NAMING
 
+#ifdef FD_SETSIZE
+#undef FD_SETSIZE
+#endif
 #define FD_SETSIZE                          SL_FD_SETSIZE        
                                                                        
 #define SOCK_STREAM                         SL_SOCK_STREAM        
@@ -412,10 +415,29 @@ extern "C" {
                                                                        
 #define MSG_DONTWAIT                        SL_MSG_DONTWAIT       
                                                                        
+#ifdef FD_SET
+#undef FD_SET
+#endif
 #define FD_SET                              SL_FD_SET  
-#define FD_CLR                              SL_FD_CLR  
+
+#ifdef FD_CLR
+#undef FD_CLR
+#endif
+#define FD_CLR                              SL_FD_CLR
+
+#ifdef FD_ISSET
+#undef FD_ISSET
+#endif
 #define FD_ISSET                            SL_FD_ISSET
+
+#ifdef FD_ZERO
+#undef FD_ZERO
+#endif
 #define FD_ZERO                             SL_FD_ZERO 
+
+#ifdef fd_set
+#undef fd_set
+#endif
 #define fd_set                              SlFdSet_t    
 
 #define socket                              sl_Socket

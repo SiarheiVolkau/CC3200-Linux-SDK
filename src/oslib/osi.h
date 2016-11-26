@@ -575,7 +575,7 @@ typedef struct
 extern void* xSimpleLinkSpawnQueue;
 
 /* API for SL Task*/
-OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority);
+OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned long uxPriority, unsigned short stack_sz);
 void VDeleteSimpleLinkSpawnTask( void );
 
 

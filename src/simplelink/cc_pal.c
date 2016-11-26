@@ -565,7 +565,9 @@ int spi_Read(Fd_t fd, unsigned char *pBuff, int len)
 				   SetupDMAReceive(&pBuff[read_size],len);
 				   MAP_SPICSEnable(LSPI_BASE);
 #if defined(SL_PLATFORM_MULTI_THREADED)
+					lock_lpds_entering();
 				   osi_MsgQRead(&DMAMsgQ,temp,OSI_WAIT_FOREVER);
+				   unlock_lpds_entering();
 #else
 				   while(g_cDummy != 0x1);
 				   g_cDummy = 0x0;
@@ -578,7 +580,9 @@ int spi_Read(Fd_t fd, unsigned char *pBuff, int len)
 					SetupDMAReceive(&pBuff[read_size],MAX_DMA_RECV_TRANSACTION_SIZE);
 					MAP_SPICSEnable(LSPI_BASE);
 #if defined(SL_PLATFORM_MULTI_THREADED)
+					lock_lpds_entering();
 				   osi_MsgQRead(&DMAMsgQ,temp,OSI_WAIT_FOREVER);
+				   unlock_lpds_entering();
 #else
 				   while(g_cDummy != 0x1);
 				   g_cDummy = 0x0;
@@ -634,7 +638,9 @@ int spi_Write(Fd_t fd, unsigned char *pBuff, int len)
 	    MAP_SPICSEnable(LSPI_BASE);
 
 #if defined(SL_PLATFORM_MULTI_THREADED)
+					lock_lpds_entering();
 				   osi_MsgQRead(&DMAMsgQ,temp,OSI_WAIT_FOREVER);
+				   unlock_lpds_entering();
 #else
 				   while(g_cDummy != 0x1);
 				   g_cDummy = 0x0;

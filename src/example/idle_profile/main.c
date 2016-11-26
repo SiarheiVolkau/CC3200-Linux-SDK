@@ -1027,7 +1027,7 @@ int main(void)
     //
     // Start the SimpleLink Host
     //
-    iRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
+    iRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY, 2048);
     if(iRetVal < 0)
     {
         UART_PRINT("could not create simplelink task\n\r");

@@ -462,12 +462,14 @@ _i32 sl_ExtLib_MqttClientInit(_const SlMqttClientLibCfg_t  *cfg)
         /* Register network services speicific to CC3200 */
         mqtt_client_net_svc_register(&net);
         /* start the receive task */
+		/*
         osi_TaskCreate( VMqttRecvTask, 
                 (_const signed char *) "MQTTRecv",
                 OSI_STACK_SIZE,
                 NULL, 
                 cfg->rx_tsk_priority, &g_rx_task_hndl );
-        
+        */
+		task_create(VMqttRecvTask, "MQTT_TASK", cfg->task_stack_size, cfg->rx_tsk_priority, NULL, &g_rx_task_hndl);
         return 0;
 }
 
@@ -663,7 +665,7 @@ _i32
 sl_ExtLib_MqttClientSub(void *cli_ctx, char* _const *topics,
                         _u8 *qos_level, _i32 count)
 {
-#define MAX_SIMULTANEOUS_SUB_TOPICS 4
+#define MAX_SIMULTANEOUS_SUB_TOPICS 5
 
         _i32 ret = -1, i;
 

@@ -502,7 +502,9 @@ void vSimpleLinkSpawnTask(void *pvParameters)
 		ret = xQueueReceive( xSimpleLinkSpawnQueue, &Msg, portMAX_DELAY );
 		if(ret == pdPASS)
 		{
-				Msg.pEntry(Msg.pValue);
+			lock_lpds_entering();
+			Msg.pEntry(Msg.pValue);
+			unlock_lpds_entering();
 		}
 	}
 }
@@ -516,19 +518,33 @@ void vSimpleLinkSpawnTask(void *pvParameters)
 	\note
 	\warning
 */
-OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned portBASE_TYPE uxPriority)
+OsiReturnVal_e VStartSimpleLinkSpawnTask(unsigned portBASE_TYPE uxPriority, unsigned short stack_sz)
 {
     xSimpleLinkSpawnQueue = xQueueCreate( slQUEUE_SIZE, sizeof( tSimpleLinkSpawnMsg ) );
     if(0 == xSimpleLinkSpawnQueue)
     {
     	return OSI_OPERATION_FAILED;
     }
-    if(pdPASS == xTaskCreate( vSimpleLinkSpawnTask, ( portCHAR * ) "SLSPAWN",\
-    					 (2048/sizeof( portSTACK_TYPE )), NULL, uxPriority, &xSimpleLinkSpawnTaskHndl ))
+#if 1
+	int err = task_create(
+		vSimpleLinkSpawnTask,
+		( portCHAR * ) "SLSPAWN",
+		stack_sz,
+		uxPriority,
+		NULL,
+		&xSimpleLinkSpawnTaskHndl
+	);
+	if (err == 0)
+	{
+		return OSI_OK;
+	}
+#else
+	if(pdPASS == xTaskCreate( vSimpleLinkSpawnTask, ( portCHAR * ) "SLSPAWN",\
+    					 (stack_sz/sizeof( portSTACK_TYPE )), NULL, uxPriority, &xSimpleLinkSpawnTaskHndl ))
     {
     	return OSI_OK;
     }
-
+#endif
     return OSI_OPERATION_FAILED;
 }
 

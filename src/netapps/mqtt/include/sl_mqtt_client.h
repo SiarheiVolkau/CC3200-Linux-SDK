@@ -255,8 +255,9 @@ extern "C"
                      multiple servers simultaneously is desired. */
                 _u16  loopback_port;  /**< Loopback port = 0, implies connection to only single server */
                                                 /**< Loopback port != 0, implies connection to multiple servers */
-                _u32   rx_tsk_priority;  /**< Priority of the receive task */
-                _u32    resp_time;        /**< Reasonable response time (seconds) from server */
+                _u16  task_stack_size;
+                _u32  rx_tsk_priority;  /**< Priority of the receive task */
+                _u32  resp_time;        /**< Reasonable response time (seconds) from server */
                 bool  aux_debug_en;               /**< Assert to indicate additional debug info */
                 _i32 (*dbg_print)(const char *pcFormat, ...); /**< Print debug information */
 

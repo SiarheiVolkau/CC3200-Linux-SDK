@@ -88,6 +88,11 @@ if (CC3200_USE_LIBS MATCHES "json")
 	include_directories(${CC3200_SDK_ROOT}/netapps/json)
 endif()
 
+if (CC3200_USE_LIBS MATCHES "mqtt-client")
+	message(STATUS "Using MQTT Client library.")
+	set(LINK_LIBS "'${CC3200_SDK_ROOT}/netapps/mqtt/gcc/lib/client/${CC3200_LIB_TYPE}/libmqtt.a' ${LINK_LIBS}")
+	include_directories(${CC3200_SDK_ROOT}/netapps/mqtt/include)
+endif()
 
 
 set(CC3200_SDK_ROOT "${CC3200_SDK_ROOT}" CACHE STRING "SDK location" FORCE)
