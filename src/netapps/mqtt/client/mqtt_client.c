@@ -1500,7 +1500,7 @@ i32 proc_ctx_data_recv(struct client_ctx *cl_ctx, struct mqtt_packet *mqp,
            (a) there is a processing / protocol error other than time-out
            (b) A good MQTT CONNACK has a return code - connection refused
         */
-        if(((rv < 0) && (rv != MQP_ERR_TIMEOUT)) ||
+        if(((rv < 0) && (rv != MQP_ERR_TIMEOUT) && (rv != MQP_ERR_PKT_LEN)) ||
            ((MQTT_CONNACK == mqp->msg_type) &&
             MQP_CONNACK_RC(mqp)))
                 do_net_close_rx(cl_ctx, rv);

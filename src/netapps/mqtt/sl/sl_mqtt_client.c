@@ -18,7 +18,7 @@
 #include "osi.h"
 
 #ifndef CFG_SL_CL_BUF_LEN
-#define BUF_LEN          1024 /*Buffer length*/
+#define BUF_LEN          1460 /*Buffer length*/
 #else
 #define BUF_LEN          CFG_SL_CL_BUF_LEN
 #endif
